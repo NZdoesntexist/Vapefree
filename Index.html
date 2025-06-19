@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vape Free Tracker</title>
+    <meta name="theme-color" content="#10b981">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Vape Free">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+```
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        color: white;
+    }
+
+    .container {
+        text-align: center;
+        max-width: 400px;
+        width: 100%;
+    }
+
+    .header {
+        margin-bottom: 40px;
+    }
+
+    .title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .subtitle {
+        font-size: 1.1rem;
+        opacity: 0.9;
+        font-weight: 300;
+    }
+
+    .counter-section {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 30px;
+        margin-bottom: 30px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .days-count {
+        font-size: 4rem;
+        font-weight: 800;
+        margin-bottom: 10px;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .days-label {
+        font-size: 1.2rem;
+        opacity: 0.9;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+    }
+
+    .button-section {
+        margin-bottom: 20px;
+    }
+
+    .vape-free-btn {
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: white;
+        border: none;
+        padding: 20px 40px;
+        font-size: 1.3rem;
+        font-weight: 600;
+        border-radius: 50px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        width: 100%;
+        max-width: 300px;
+    }
+
+    .vape-free-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 35px rgba(16, 185, 129, 0.4);
+    }
+
+    .vape-free-btn:active {
+        transform: translateY(0);
+    }
+
+    .vape-free-btn:disabled {
+        background: #6b7280;
+        cursor: not-allowed;
+        box-shadow: none;
+        transform: none;
+    }
+
+    .reset-btn {
+        background: rgba(239, 68, 68, 0.8);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        font-size: 0.9rem;
+        border-radius: 25px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 15px;
+    }
+
+    .reset-btn:hover {
+        background: rgba(239, 68, 68, 1);
+    }
+
+    .last-check-in {
+        margin-top: 20px;
+        font-size: 0.9rem;
+        opacity: 0.8;
+    }
+
+    .motivational-message {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(5px);
+        border-radius: 15px;
+        padding: 20px;
+        margin-top: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    @media (max-width: 480px) {
+        .title {
+            font-size: 2rem;
+        }
+        
+        .days-count {
+            font-size: 3rem;
+        }
+        
+        .vape-free-btn {
+            font-size: 1.1rem;
+            padding: 18px 35px;
+        }
+    }
+</style>
+```
+
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="title">💨 Vape Free</h1>
+            <p class="subtitle">Your journey to freedom</p>
+        </div>
+
+```
+    <div class="counter-section">
+        <div class="days-count" id="daysCount">0</div>
+        <div class="days-label">Days Vape Free</div>
+    </div>
+
+    <div class="button-section">
+        <button class="vape-free-btn" id="checkInBtn">
+            ✅ I Am Vape Free Today
+        </button>
+        <div class="last-check-in" id="lastCheckIn"></div>
+    </div>
+
+    <div class="motivational-message" id="motivationalMessage">
+        <p>Every day counts! You're building a healthier future.</p>
+    </div>
+
+    <button class="reset-btn" id="resetBtn" onclick="resetCounter()">Reset Counter</button>
+</div>
+
+<script>
+    let daysVapeFree = 0;
+    let lastCheckInDate = null;
+
+    // Load data from localStorage
+    function loadData() {
+        try {
+            const saved = JSON.parse(localStorage.getItem('vapeFreeData')) || {};
+            daysVapeFree = saved.days || 0;
+            lastCheckInDate = saved.lastDate || null;
+        } catch (e) {
+            console.log('localStorage not available, using defaults');
+        }
+        updateDisplay();
+    }
+
+    // Save data to localStorage
+    function saveData() {
+        try {
+            localStorage.setItem('vapeFreeData', JSON.stringify({
+                days: daysVapeFree,
+                lastDate: lastCheckInDate
+            }));
+        } catch (e) {
+            console.log('Could not save to localStorage');
+        }
+    }
+
+    // Update the display
+    function updateDisplay() {
+        document.getElementById('daysCount').textContent = daysVapeFree;
+        
+        const checkInBtn = document.getElementById('checkInBtn');
+        const lastCheckInElement = document.getElementById('lastCheckIn');
+        
+        if (lastCheckInDate) {
+            const today = new Date().toDateString();
+            if (lastCheckInDate === today) {
+                checkInBtn.disabled = true;
+                checkInBtn.textContent = '✅ Already Checked In Today';
+                lastCheckInElement.textContent = 'You\'ve already checked in today!';
+            } else {
+                checkInBtn.disabled = false;
+                checkInBtn.textContent = '✅ I Am Vape Free Today';
+                lastCheckInElement.textContent = `Last check-in: ${lastCheckInDate}`;
+            }
+        } else {
+            checkInBtn.disabled = false;
+            lastCheckInElement.textContent = '';
+        }
+        
+        updateMotivationalMessage();
+    }
+
+    // Update motivational message based on progress
+    function updateMotivationalMessage() {
+        const messageElement = document.getElementById('motivationalMessage');
+        let message = '';
+        
+        if (daysVapeFree === 0) {
+            message = "Ready to start your vape-free journey? Every day counts!";
+        } else if (daysVapeFree === 1) {
+            message = "🎉 Amazing! You've completed your first day vape-free!";
+        } else if (daysVapeFree < 7) {
+            message = `💪 ${daysVapeFree} days strong! You're building momentum!`;
+        } else if (daysVapeFree < 30) {
+            message = `🔥 ${daysVapeFree} days! Your body is already healing!`;
+        } else if (daysVapeFree < 90) {
+            message = `🌟 ${daysVapeFree} days! You're developing lasting habits!`;
+        } else {
+            message = `👑 ${daysVapeFree} days! You're a vape-free champion!`;
+        }
+        
+        messageElement.innerHTML = `<p>${message}</p>`;
+    }
+
+    // Check in for today
+    function checkIn() {
+        const today = new Date().toDateString();
+        
+        if (lastCheckInDate !== today) {
+            daysVapeFree++;
+            lastCheckInDate = today;
+            saveData();
+            updateDisplay();
+            
+            // Add celebration animation
+            celebrateCheckIn();
+        }
+    }
+
+    // Add celebration animation
+    function celebrateCheckIn() {
+        const counter = document.getElementById('daysCount');
+        counter.style.transform = 'scale(1.2)';
+        counter.style.transition = 'transform 0.3s ease';
+        
+        setTimeout(() => {
+            counter.style.transform = 'scale(1)';
+        }, 300);
+    }
+
+    // Reset counter
+    function resetCounter() {
+        if (confirm('Are you sure you want to reset your counter? This cannot be undone.')) {
+            daysVapeFree = 0;
+            lastCheckInDate = null;
+            saveData();
+            updateDisplay();
+        }
+    }
+
+    // Event listeners
+    document.getElementById('checkInBtn').addEventListener('click', checkIn);
+
+    // Load data when page loads
+    loadData();
+</script>
+```
+
+</body>
+</html>
